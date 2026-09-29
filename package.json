@@ -1,0 +1,21 @@
+{
+  "name": "arpit-code-xray",
+  "version": "1.0.0",
+  "description": "A CLI tool that analyzes a project and generates a codebase X-Ray and Code Weather report.",
+  "main": "src/index.js",
+  "bin": {
+    "arpit-code-xray": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node bin/cli.js"
+  },
+  "keywords": [
+    "cli",
+    "code-analysis",
+    "project-analysis",
+    "developer-tools"
+  ],
+  "author": "Arpit",
+  "license": "MIT",
+  "type": "commonjs"
+}
