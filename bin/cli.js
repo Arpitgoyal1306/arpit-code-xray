@@ -31,7 +31,9 @@ console.log("");
 console.log("🌦️ CODE WEATHER");
 console.log(`  ${weather.weather}`);
 console.log("");
-console.log(`  TODOs  : ${weather.todoCount}`);
-console.log(`  FIXMEs : ${weather.fixmeCount}`);
+
+console.log(`  TODOs         : ${weather.todoCount}`);
+console.log(`  FIXMEs        : ${weather.fixmeCount}`);
+console.log(`  Syntax Errors : ${weather.syntaxErrors}`);
 
 console.log("");

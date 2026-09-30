@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { execFileSync } = require("child_process");
 
 function scanProject(directory) {
   const result = {
@@ -44,49 +45,48 @@ function scanProject(directory) {
 }
 
 function detectTechnologies(directory) {
-    const technologies = [];
+  const technologies = [];
 
-    const packagePath = path.join(directory, "package.json");
+  const packagePath = path.join(directory, "package.json");
 
-    if (!fs.existsSync(packagePath)) {
-        return technologies;
-    }
-
-    const packageJson = JSON.parse(
-        fs.readFileSync(packagePath, "utf-8")
-    );
-
-    const dependencies = {
-        ...packageJson.dependencies,
-        ...packageJson.devDependencies
-    };
-
-    if (dependencies.express) {
-        technologies.push("Express");
-    }
-
-    if (dependencies.react) {
-        technologies.push("React");
-    }
-
-    if (dependencies.next) {
-        technologies.push("Next.js");
-    }
-
-    if (dependencies.prisma) {
-        technologies.push("Prisma");
-    }
-
-    if (technologies.length === 0) {
-        technologies.push("Node.js");
-    }
-
+  if (!fs.existsSync(packagePath)) {
     return technologies;
+  }
+
+  const packageJson = JSON.parse(fs.readFileSync(packagePath, "utf-8"));
+
+  const dependencies = {
+    ...packageJson.dependencies,
+    ...packageJson.devDependencies,
+  };
+
+  if (dependencies.express) {
+    technologies.push("Express");
+  }
+
+  if (dependencies.react) {
+    technologies.push("React");
+  }
+
+  if (dependencies.next) {
+    technologies.push("Next.js");
+  }
+
+  if (dependencies.prisma) {
+    technologies.push("Prisma");
+  }
+
+  if (technologies.length === 0) {
+    technologies.push("Node.js");
+  }
+
+  return technologies;
 }
 
 function getCodeWeather(directory) {
   let todoCount = 0;
   let fixmeCount = 0;
+  let syntaxErrors = 0;
 
   function scanFolder(folder) {
     const files = fs.readdirSync(folder);
@@ -110,15 +110,27 @@ function getCodeWeather(directory) {
 
         const content = fs.readFileSync(filePath, "utf-8");
 
+        // Count TODO comments
         todoCount += (content.match(/\/\/.*TODO/g) || []).length;
+
+        // Count FIXME comments
         fixmeCount += (content.match(/\/\/.*FIXME/g) || []).length;
+
+        // Check JavaScript syntax
+        try {
+          execFileSync(process.execPath, ["--check", filePath], {
+            stdio: "ignore",
+          });
+        } catch {
+          syntaxErrors++;
+        }
       }
     }
   }
 
   scanFolder(directory);
 
-  const totalIssues = todoCount + fixmeCount;
+  const totalIssues = todoCount + fixmeCount + syntaxErrors;
 
   let weather;
 
@@ -135,12 +147,13 @@ function getCodeWeather(directory) {
   return {
     todoCount,
     fixmeCount,
+    syntaxErrors,
     weather,
   };
 }
 
 module.exports = {
-    scanProject,
-    detectTechnologies,
-    getCodeWeather
+  scanProject,
+  detectTechnologies,
+  getCodeWeather,
 };
