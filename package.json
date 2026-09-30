@@ -1,6 +1,6 @@
 {
   "name": "arpit-code-xray",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A CLI tool that analyzes a project and generates a codebase X-Ray and Code Weather report.",
   "main": "src/index.js",
   "bin": {
